@@ -72,7 +72,7 @@ def update_visitor_count (table,ip):
     return 
     {
             "statusCode":200,
-            "body":json.dumps({"message":"Visitor Count updated succesfully !", "ip":ip ,"ts":ts,"visit_count":visit_count})
+            "body":json.dumps({"message":"Visitor Count updated succesfully !"})
         }
     
     
