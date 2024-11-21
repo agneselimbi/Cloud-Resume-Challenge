@@ -56,16 +56,20 @@ def get_visitor_count():
 
 def update_visitor_count (table,ip):
     ts = str(datetime.datetime.now().timestamp())
+    current_date = datetime.datetime.combine(datetime.datetime.now(),datetime.time.min)
+    current_date = str(current_date.timestamp())
     try:
         table.update_item(
             Key = {
                 'visitor_ip': ip
                   },
             UpdateExpression="SET  visit_count=if_not_exists(visit_count, :start) + :increment,ts= :ts",
+            ConditionExpression='attribute_not_exists(ts) OR ts < :currentDate',
             ExpressionAttributeValues={
             ':increment':1,
             ':start':0,
-            ':ts' : ts            
+            ':ts' : ts,
+            ':currentDate': current_date         
             }
         )
         return {
@@ -75,8 +79,18 @@ def update_visitor_count (table,ip):
             "body":json.dumps({"message":"Visitor added to table succesfully !"})
              }
     except ClientError as e:
-        return {
+        if e.response['Error']['Code'] == "ConditionalCheckFailedException":
+            return{
+                "statusCode":200,
+                "headers":{ "Access-Control-Allow-Origin":"*",
+                        "Content-Type":"application/json"},
+                "body":json.dumps({"message":"Visitor count already updated"})
+            }
+        else:
+            return {
             "statusCode":500,
+            "headers":{ "Access-Control-Allow-Origin":"*",
+                        "Content-Type":"application/json"},
             "body":json.dumps({"message":"Unable to insert new item to table","error":str(e)})
         }
 
