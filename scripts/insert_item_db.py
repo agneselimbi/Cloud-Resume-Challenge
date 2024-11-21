@@ -48,10 +48,11 @@ def get_visitor_count():
 
     return {
         'statusCode':200,
-        'body': {
-                'total_visitor_count': total_visitor_count
+         "headers":{ "Access-Control-Allow-Origin":"*",
+                     "Content-Type":"application/json",
+         },
+        'body': json.dumps({'total_visitor_count': total_visitor_count})
             }
-    }
 
 def update_visitor_count (table,ip):
     ts = str(datetime.datetime.now().timestamp())
@@ -67,12 +68,17 @@ def update_visitor_count (table,ip):
             ':ts' : ts            
             }
         )
-    except :
-        print("error")
-    return 
-    {
+        return {
             "statusCode":200,
-            "body":json.dumps({"message":"Visitor Count updated succesfully !"})
+            "headers":{ "Access-Control-Allow-Origin":"*",
+                        "Content-Type":"application/json"},
+            "body":json.dumps({"message":"Visitor added to table succesfully !"})
+             }
+    except ClientError as e:
+        return {
+            "statusCode":500,
+            "body":json.dumps({"message":"Unable to insert new item to table","error":str(e)})
         }
+
     
     
