@@ -31,9 +31,9 @@
 </head>
 
 <body>
-  <button onclick="incrementVisitorCounter()">Increment Visitor Counter</button>
+  <p id ="resp"></p>
+  <button onclick="refreshVisitorCounter()">Refresh Visitor Counter</button>
   <p id="response"></p>
-  <p id="error"></p>
 
   <!-- Personal information -->
   <section class="about">
@@ -206,31 +206,57 @@
 
 <script>
   // Function to trigger the Lambda function via API Gateway
-  async function incrementVisitorCounter() {
-      const apiUrl = "https://whl8seiwel.execute-api.us-west-1.amazonaws.com/dev/increment-counter"; // Replace with your API Gateway URL
-
-      const data = {
-        visitor_name: 'Lupe'
-      };
+    async function updateVisitorCounter(){
+      
+      const postapiUrl = "https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/incrementVisitorCount"; // Replace with your API Gateway URL
 
       try {
-        const response = await fetch(apiUrl, {
-          method: "POST",
+        const postresponse = await fetch(postapiUrl,
+                          {
+                            method : "POST",
+                            headers : {
+                              "Content-Type":"application/json"
+                                 }
+                          }
+        );
+        
+        // Parse the JSON response
+        const res = await postresponse.json();
+
+        // Display response in the page
+        document.getElementById("resp").innerText= JSON.stringify(res.message, null, 2);
+        resp.style.display = 'block'; //Show the message
+        setTimeout(()=>{resp.style.display = 'none'; //Hide the message 
+        },3000);
+      }
+      catch(error){
+        console.error("Error:", error);
+        document.getElementById("resp").innerText = "Unable to display visitor count";
+      }
+    }
+     // Trigger API Gateway on load
+     window.onload=updateVisitorCounter;
+
+  async function refreshVisitorCounter() {
+    const getapiUrl = " https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/getVisitorCount" ;// Replace with your API Gateway URL
+      
+      try {
+        const response = await fetch(getapiUrl, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data)
+          } 
         });
 
         // Parse the JSON response
         const result = await response.json();
 
         // Display response in the page
-        document.getElementById("response").innerText = result.message || "Visitor incremented successfully!";
-      } 
+        document.getElementById("response").innerText = JSON.stringify(result.total_visitor_count, null, 2);
+      }  
       catch (error) {
         console.error("Error:", error);
-        document.getElementById("response").innerText = "Failed to increment visitor count.";
+        document.getElementById("response").innerText = "Unable to update visitor count.";
       }
     }
 </script>
