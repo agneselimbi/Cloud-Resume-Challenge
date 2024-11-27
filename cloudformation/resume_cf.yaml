@@ -7,25 +7,23 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       TableName: visitorCountTable
       AttributeDefinitions:
-        - 
-          AttributeName: visitor_ip
+        - AttributeName: visitor_ip
           AttributeType: S
       KeySchema:
-        - 
-          AttributeName: visitor_ip
+        - AttributeName: visitor_ip
           KeyType: HASH
 
   manageTable:
     Type: AWS::Lambda::Function
     Properties:
       Runtime: python3.10
-      Handler: lambda_function.lambda_handler
+      Handler: insert_item_db.lambda_handler
       Role: !GetAtt MyLambdaExecutionRole.Arn
       Environment:
         Variables:
           tableName: !Ref visitorCountTable
       Code:
-        S3Bucket: 'lambdasam-b4e58c7834-us-west-1'
+        S3Bucket: lambdasam-b4e58c7834-us-west-1
         S3Key: insert_item_db.zip
       Timeout: 30
       FunctionName: manageTableLambda
@@ -41,13 +39,38 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       ManagedPolicyArns:
-          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-          - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
 
   MyAPIGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: visitCountAPI
+
+  MyAPIDeployment:
+    DependsOn: 
+      - APIGatewayPostMethod
+      - APIGatewayGetMethod
+      - APIGatewayOptionsMethod
+      - APIGatewayOptionsMethod2
+
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref MyAPIGateway
+      StageName: test
+
+  MyAPIStage:
+    Type: 'AWS::ApiGateway::Stage'
+    Properties:
+      RestApiId: !Ref MyAPIGateway
+      DeploymentId: !Ref MyAPIDeployment
+      StageName: dev
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          CachingEnabled: true
+          CacheTtlInSeconds: 3600
+          DataTraceEnabled: true
 
   IncrementVisitorCountGatewayResource:
     Type: AWS::ApiGateway::Resource
@@ -57,7 +80,6 @@ Resources:
       RestApiId: !Ref MyAPIGateway
 
   APIGatewayPostMethod:
-    DependsOn: LambdaInvokePermission
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: NONE
@@ -70,25 +92,44 @@ Resources:
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${manageTable.Arn}/invocations
           - manageTable: !Ref manageTable
-        IntegrationResponses:
+
+      MethodResponses:
         - StatusCode: 200
           ResponseParameters:
-            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-            method.response.header.Access-Control-Allow-Origin: "'*'"
+            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+            method.response.header.Access-Control-Allow-Origin: '''*'''
         - StatusCode: 400
-          SelectionPattern: '4\d{2}'
           ResponseParameters:
-            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-            method.response.header.Access-Control-Allow-Origin: "'*'"
+            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+            method.response.header.Access-Control-Allow-Origin: '''*'''
+
+  APIGatewayOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      ResourceId: !Ref IncrementVisitorCountGatewayResource
+      RestApiId: !Ref MyAPIGateway
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: MOCK
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${manageTable.Arn}/invocations
+          - manageTable: !Ref manageTable
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+              method.response.header.Access-Control-Allow-Methods: '''POST,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''*'''
       MethodResponses:
-      - StatusCode: 200
-        ResponseParameters:
-          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          method.response.header.Access-Control-Allow-Origin: "'*'"
-      - StatusCode: 400
-        ResponseParameters:
-            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-            method.response.header.Access-Control-Allow-Origin: "'*'"
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+            method.response.header.Access-Control-Allow-Methods: '''POST,OPTIONS'''
+            method.response.header.Access-Control-Allow-Origin: '''*'''
 
   GetVisitorCountGatewayResource:
     Type: AWS::ApiGateway::Resource
@@ -98,7 +139,6 @@ Resources:
       RestApiId: !Ref MyAPIGateway
 
   APIGatewayGetMethod:
-    DependsOn: LambdaInvokePermission
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: NONE
@@ -106,45 +146,102 @@ Resources:
       ResourceId: !Ref GetVisitorCountGatewayResource
       RestApiId: !Ref MyAPIGateway
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${manageTable.Arn}/invocations
           - manageTable: !Ref manageTable
-        IntegrationResponses:
+      MethodResponses:
         - StatusCode: 200
           ResponseParameters:
-            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-            method.response.header.Access-Control-Allow-Origin: "'*'"
+            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+            method.response.header.Access-Control-Allow-Origin: '''*'''
         - StatusCode: 400
-          SelectionPattern: '4\d{2}'
           ResponseParameters:
-            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-            method.response.header.Access-Control-Allow-Origin: "'*'"
-      MethodResponses:
-      - StatusCode: 200
-        ResponseParameters:
-          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          method.response.header.Access-Control-Allow-Origin: "'*'"
-      - StatusCode: 400
-        ResponseParameters:
-          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          method.response.header.Access-Control-Allow-Origin: "'*'"
+            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+            method.response.header.Access-Control-Allow-Origin: '''*'''
 
-  LambdaInvokePermission:
+  APIGatewayOptionsMethod2:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      ResourceId: !Ref GetVisitorCountGatewayResource
+      RestApiId: !Ref MyAPIGateway
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: MOCK
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${manageTable.Arn}/invocations
+          - manageTable: !Ref manageTable
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''*'''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+            method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+            method.response.header.Access-Control-Allow-Origin: '''*'''
+
+  LambdaInvokeGetPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref manageTable
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub
-        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*/*/*
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/${ApiStage}/GET/getVisitorCount
         - ApiGatewayRestApi: !Ref MyAPIGateway
-  
-  Outputs:
+          ApiStage : !Ref MyAPIStage
+
+  LambdaInvokeOptionsPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref manageTable
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/${ApiStage}/OPTIONS/getVisitorCount
+        - ApiGatewayRestApi: !Ref MyAPIGateway
+          ApiStage : !Ref MyAPIStage
+
+  LambdaInvokePostPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref manageTable
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/${ApiStage}/POST/incrementVisitorCount
+        - ApiGatewayRestApi: !Ref MyAPIGateway
+          ApiStage : !Ref MyAPIStage
+
+  LambdaInvokeOptionsPermission2:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref manageTable
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/${ApiStage}/OPTIONS/incrementVisitorCount
+        - ApiGatewayRestApi: !Ref MyAPIGateway
+          ApiStage : !Ref MyAPIStage
+
+Outputs:
   GetApiUrl:
-    Description: "Url of Get VisitorCount"
-    Value: !Sub "https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/getVisitorCount"
+    Description: Url of Get VisitorCount
+    Value: !Sub
+    - https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/${ApiStage}/getVisitorCount
+    - ApiStage : !Ref MyAPIStage
+
   PostApiUrl:
-    Description: "Url of Increment VisitorCount"
-    Value: !Sub "https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/incrementVisitorCount"
+    Description: Url of Increment VisitorCount
+    Value: !Sub 
+    - https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/${ApiStage}/incrementVisitorCount
+    - ApiStage : !Ref MyAPIStage
