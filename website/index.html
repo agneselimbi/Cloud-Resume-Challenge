@@ -205,10 +205,27 @@
 </body>
 
 <script>
+  //Function to retrieve the API url
+  const AWS = require('aws-sdk');
+  const cloudformation = new AWS.CloudFormation ({region:'us-west-1'});
+  const stackName = '';
+
+  cloudformation.describeStacks({StackName:stackName},(err,data) => {
+    if (err){
+      console.log('Error',err);
+    }else{
+      const outputs = data.Stacks[0].Outputs;
+      const postapiUrl = outputs.find(output => output.OutputKey == PostApiUrl.OutputValue);
+      const getapiUrl = outputs.find(output => output.OutputKey == GetApiUrl).OutputValue;
+      console.log('Post API URL:', postapiUrl);
+      console.log('Get API URL:' , getapiUrl);
+    }
+  })
+
   // Function to trigger the Lambda function via API Gateway
     async function updateVisitorCounter(){
       
-      const postapiUrl = "https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/incrementVisitorCount"; // Replace with your API Gateway URL
+      //const postapiUrl = "https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/incrementVisitorCount"; // Replace with your API Gateway URL
 
       try {
         const postresponse = await fetch(postapiUrl,
@@ -238,7 +255,7 @@
      window.onload=updateVisitorCounter;
 
   async function refreshVisitorCounter() {
-    const getapiUrl = " https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/getVisitorCount" ;// Replace with your API Gateway URL
+    //const getapiUrl = " https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/getVisitorCount" ;// Replace with your API Gateway URL
       
       try {
         const response = await fetch(getapiUrl, {
