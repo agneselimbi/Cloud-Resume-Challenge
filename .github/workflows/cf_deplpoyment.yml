@@ -21,38 +21,17 @@ jobs:
         sudo apt-get update && sudo apt-get install -y awscli
         aws --version
 
-    # Step 3: Authenticate with AWS IAM Identity Center
-    - name: AWS SSO Login
+    # Step 3: Authenticate with AWS environment variables
+    - name: AWS Login
       env:
-        AWS_REGION: us-west-1
+        AWS_REGION: "us-west-1"
+        AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY)
+        AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}
         AWS_SSO_START_URL: ${{ secrets.AWS_SSO_START_URL }}  # Your Identity Center Start URL
         AWS_SSO_ACCOUNT_ID: ${{ secrets.AWS_SSO_ACCOUNT_ID }}  # Target account ID
         AWS_SSO_ROLE_NAME: ${{ secrets.AWS_SSO_ROLE_NAME }}  # IAM role in the target account
-      run: |
-        # Configure SSO profile
-        aws configure sso-session
-
-        aws configure set sso_session "GitHubSSOSession" --profile GitHubSSOProfile
-        aws configure set sso_account_id $AWS_SSO_ACCOUNT_ID --profile GitHubSSOProfile
-        aws configure set sso_role_name $AWS_SSO_ROLE_NAME --profile GitHubSSOProfile
-        aws configure set region $AWS_REGION --profile GitHubSSOProfile
-
-        # Login to SSO
-        aws sso login --profile GitHubSSOProfile
-
-    # Step 4: Retrieve Temporary Credentials
-    - name: Retrieve Temporary AWS Credentials
-      id: retrieve-credentials
-      run: |
-        TEMP_CREDENTIALS=$(aws sts get-caller-identity --profile GitHubSSOProfile --output json)
-        
-        # Export the credentials for further steps
-        echo "AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id --profile GitHubSSOProfile)" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile GitHubSSOProfile)" >> $GITHUB_ENV
-        echo "AWS_SESSION_TOKEN=$(aws configure get aws_session_token --profile GitHubSSOProfile)" >> $GITHUB_ENV
-
-    # Step 5: Use Temporary Credentials
-    - name: Validate AWS Identity
+  
       run: |
         aws sts get-caller-identity
         aws s3 ls  # Example command
