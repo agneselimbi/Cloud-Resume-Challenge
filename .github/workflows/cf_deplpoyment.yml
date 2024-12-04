@@ -33,5 +33,5 @@ jobs:
         AWS_SSO_ROLE_NAME: ${{ secrets.AWS_SSO_ROLE_NAME }}  # IAM role in the target account
   
       run: |
-        aws sts get-caller-identity
+       
         aws s3 ls  # Example command
