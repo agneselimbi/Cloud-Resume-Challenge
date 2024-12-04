@@ -41,8 +41,9 @@ jobs:
       # Step 4: Validate Cloud Formation template 
     - name: Validate Cloud Formation Template
       run: |
+        AWS_REGION: "us-west-1"
         TEMPLATE_FILE='cloudformation/resume_cf.yaml'
-        aws cloudformation validate-template --template-body $TEMPLATE_FILE
+        aws cloudformation validate-template --template-body $TEMPLATE_FILE --region $AWS_REGION
 
       # Step 5: Deploy Cloud Formation template 
     - name: Deploy Cloud Formation Template 
