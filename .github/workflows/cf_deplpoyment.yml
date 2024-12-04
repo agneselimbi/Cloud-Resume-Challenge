@@ -28,9 +28,9 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
         AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}
-        AWS_SSO_START_URL: ${{ secrets.AWS_SSO_START_URL }}  # Your Identity Center Start URL
-        AWS_SSO_ACCOUNT_ID: ${{ secrets.AWS_SSO_ACCOUNT_ID }}  # Target account ID
-        AWS_SSO_ROLE_NAME: ${{ secrets.AWS_SSO_ROLE_NAME }}  # IAM role in the target account
+        #AWS_SSO_START_URL: ${{ secrets.AWS_SSO_START_URL }}  # Your Identity Center Start URL
+        #AWS_SSO_ACCOUNT_ID: ${{ secrets.AWS_SSO_ACCOUNT_ID }}  # Target account ID
+        #AWS_SSO_ROLE_NAME: ${{ secrets.AWS_SSO_ROLE_NAME }}  # IAM role in the target account
   
       run: |
        
