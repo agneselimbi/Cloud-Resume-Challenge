@@ -1,0 +1,8 @@
+{
+    "status": 200,
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    },
+    "body":{"message": "Visitor added to table succesfully !"}
+  }
