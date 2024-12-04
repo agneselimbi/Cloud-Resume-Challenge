@@ -34,7 +34,7 @@ jobs:
         export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
         aws sts get-caller-identity
         AWS_REGION="us-west-1"
-        TEMPLATE_FILE='cloudformation/resume_cf.yaml'  
+        TEMPLATE_FILE='file://cloudformation/resume_cf.yaml'  
         STACK_NAME='my-resume-cf-stack'
         
         # Validate Cloud Formation template 
