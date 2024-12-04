@@ -1,0 +1,61 @@
+name: AWS IAM Identity Center Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  use-iam-identity-center:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the code
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Step 2: Install AWS CLI and AWS SSO Login Tool
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update && sudo apt-get install -y awscli
+        aws --version
+
+    # Step 3: Authenticate with AWS IAM Identity Center
+    - name: AWS SSO Login
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}  # Set your region
+        AWS_SSO_START_URL: ${{ secrets.AWS_SSO_START_URL }}  # Your Identity Center Start URL
+        AWS_SSO_ACCOUNT_ID: ${{ secrets.AWS_SSO_ACCOUNT_ID }}  # Target account ID
+        AWS_SSO_ROLE_NAME: ${{ secrets.AWS_SSO_ROLE_NAME }}  # IAM role in the target account
+      run: |
+        # Configure SSO profile
+        aws configure sso-session add \
+          --sso-session "GitHubSSOSession" \
+          --sso-start-url $AWS_SSO_START_URL \
+          --region $AWS_REGION
+
+        aws configure set sso_session "GitHubSSOSession" --profile GitHubSSOProfile
+        aws configure set sso_account_id $AWS_SSO_ACCOUNT_ID --profile GitHubSSOProfile
+        aws configure set sso_role_name $AWS_SSO_ROLE_NAME --profile GitHubSSOProfile
+        aws configure set region $AWS_REGION --profile GitHubSSOProfile
+
+        # Login to SSO
+        aws sso login --profile GitHubSSOProfile
+
+    # Step 4: Retrieve Temporary Credentials
+    - name: Retrieve Temporary AWS Credentials
+      id: retrieve-credentials
+      run: |
+        TEMP_CREDENTIALS=$(aws sts get-caller-identity --profile GitHubSSOProfile --output json)
+        
+        # Export the credentials for further steps
+        echo "AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id --profile GitHubSSOProfile)" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile GitHubSSOProfile)" >> $GITHUB_ENV
+        echo "AWS_SESSION_TOKEN=$(aws configure get aws_session_token --profile GitHubSSOProfile)" >> $GITHUB_ENV
+
+    # Step 5: Use Temporary Credentials
+    - name: Validate AWS Identity
+      run: |
+        aws sts get-caller-identity
+        aws s3 ls  # Example command
