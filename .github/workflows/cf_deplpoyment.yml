@@ -1,4 +1,4 @@
-name: AWS IAM Identity Center Workflow
+name: Cloud Formation Deployment
 
 on:
   push:
@@ -37,4 +37,41 @@ jobs:
         export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
         aws sts get-caller-identity
-        aws s3 ls  # Example command
+      
+      # Step 4: Validate Cloud Formation template 
+    - name: Validate Cloud Formation Template
+      run: |
+        aws cloudformation validate-template --template-body 
+
+      # Step 5: Deploy Cloud Formation template 
+    - name: Deploy Cloud Formation Template 
+      run: |
+        STACK_NAME='my-resume-cf-stack'
+        TEMPLATE_FILE='cloudformation/resume_cf.yaml'
+        aws cloudformation deploy\
+        --stack-name $STACK_NAME
+        --template-file $TEMPLATE_FILE
+
+    # Step6: Collect API outputs
+    - name: collect API URL
+      run: |
+        STACK_NAME='my-resume-cf-stack'
+        GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
+          --query "Stacks[0].Outputs.GetApiUrl"'
+        POST_API_URL=aws cloudformation describe-stacks --stack-name $STACK_NAME\
+          --query "Stacks[0].Outputs.PostApiUrl"'
+
+      #Step7: Set up Node.js
+    - name: set up Node.js
+      uses: actions/setup-node@v2   
+      with:
+        node-version:'14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Cypress test 
+      run: npx cypress run
+        
+        
+      
