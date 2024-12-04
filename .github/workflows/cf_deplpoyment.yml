@@ -30,10 +30,7 @@ jobs:
         AWS_SSO_ROLE_NAME: ${{ secrets.AWS_SSO_ROLE_NAME }}  # IAM role in the target account
       run: |
         # Configure SSO profile
-        aws configure sso-session add \
-          --sso-session "GitHubSSOSession" \
-          --sso-start-url $AWS_SSO_START_URL \
-          --region $AWS_REGION
+        aws configure sso-session
 
         aws configure set sso_session "GitHubSSOSession" --profile GitHubSSOProfile
         aws configure set sso_account_id $AWS_SSO_ACCOUNT_ID --profile GitHubSSOProfile
