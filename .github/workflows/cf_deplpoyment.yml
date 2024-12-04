@@ -24,7 +24,7 @@ jobs:
     # Step 3: Authenticate with AWS IAM Identity Center
     - name: AWS SSO Login
       env:
-        AWS_REGION: ${{ secrets.AWS_REGION }}  # Set your region
+        AWS_REGION: us-west-1
         AWS_SSO_START_URL: ${{ secrets.AWS_SSO_START_URL }}  # Your Identity Center Start URL
         AWS_SSO_ACCOUNT_ID: ${{ secrets.AWS_SSO_ACCOUNT_ID }}  # Target account ID
         AWS_SSO_ROLE_NAME: ${{ secrets.AWS_SSO_ROLE_NAME }}  # IAM role in the target account
