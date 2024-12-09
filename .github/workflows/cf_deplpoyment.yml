@@ -36,6 +36,7 @@ jobs:
         TEMPLATE_FILE='file://cloudformation/resume_cf.yaml'  
         STACK_NAME='my-resume-cf-stack'
 
+        # Verify caller has the right credentials
         aws sts get-caller-identity
         
         # Validate Cloud Formation template 
