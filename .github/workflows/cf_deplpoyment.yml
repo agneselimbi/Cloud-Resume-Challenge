@@ -44,12 +44,11 @@ jobs:
         --region $AWS_REGION
         echo "Template validated"
 
-        aws cloudformation create-stack help
             
         # Deploy Cloud Formation template 
         aws cloudformation create-stack \
         --stack-name my-resume-cf-stack\
-        --template-body file://cloudformation/resume_cf.yaml \
+        --template-body "file://cloudformation/resume_cf.yaml" \
         --capabilities CAPABILITY_IAM \
         --region us-west-1
         
