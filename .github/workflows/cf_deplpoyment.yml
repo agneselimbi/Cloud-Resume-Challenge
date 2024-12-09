@@ -18,9 +18,9 @@ jobs:
     # Step 2: Install AWS CLI and AWS SSO Login Tool
     - name: Install AWS CLI
       run: |
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
-        sudo ./aws/install --update
+        sudo ./aws/install
         #sudo apt-get update && sudo apt-get install -y awscli
         aws --version
 
