@@ -47,11 +47,11 @@ jobs:
         aws cloudformation create-stack help
             
         # Deploy Cloud Formation template 
-        aws cloudformation create-stack\
-        --stack-name $STACK_NAME\
-        --template-body $TEMPLATE_BODY\
+        aws cloudformation create-stack \
+        --stack-name my-resume-cf-stack\
+        --template-body file://https://github.com/agneselimbi/Cloud-Resume-Challenge/blob/main/cloudformation/resume_cf.yaml \
         --capabilities CAPABILITY_IAM \
-        --region $AWS_REGION
+        --region us-west-1
         
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
