@@ -52,6 +52,8 @@ jobs:
         echo $STACK_NAME
         echo $TEMPLATE_BODY
         echo $AWS_REGION
+
+       aws cloudformation create-stack help 
        
         # Deploy Cloud Formation template 
         aws cloudformation create-stack\
