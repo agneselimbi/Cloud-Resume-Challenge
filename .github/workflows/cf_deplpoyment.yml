@@ -49,8 +49,7 @@ jobs:
         aws cloudformation deploy\
         --stack-name my-resume-cf-stack\
         --template-file cloudformation/resume_cf.yaml \
-        --capabilities CAPABILITY_IAM \
-        --region us-west-1
+        --capabilities CAPABILITY_IAM 
         
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
