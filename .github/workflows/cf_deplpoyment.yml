@@ -49,10 +49,6 @@ jobs:
         --region $AWS_REGION
 
         echo "Template validated"
-        echo $STACK_NAME
-        echo $TEMPLATE_BODY
-        echo $AWS_REGION
-
        aws cloudformation create-stack help 
        
         # Deploy Cloud Formation template 
@@ -65,7 +61,7 @@ jobs:
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.GetApiUrl"'
-        POST_API_URL=aws cloudformation describe-stacks --stack-name $STACK_NAME\
+        POST_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.PostApiUrl"'
 
       #Step4: Set up Node.js
