@@ -18,10 +18,9 @@ jobs:
     # Step 2: Install AWS CLI and AWS SSO Login Tool
     - name: Install AWS CLI
       run: |
-        sudo apt update && sudo apt-get -y install awscli
+        sudo apt-get update && sudo apt-get install -y awscli
         aws --version
-
-    # Step 3: Authenticate with AWS environment variables.
+    # Step 3: Authenticate with AWS environment variables
     - name: AWS Login
       env:
         AWS_REGION: "us-west-1"
@@ -36,7 +35,6 @@ jobs:
         TEMPLATE_BODY="file://cloudformation/resume_cf.yaml"
         TEMPLATE_FILE=cloudformation/resume_cf.yaml
         STACK_NAME='my-resume-cf-stack'
-
         # Verify caller has the right credentials
         aws sts get-caller-identity
         
@@ -44,9 +42,10 @@ jobs:
         aws cloudformation validate-template \
         --template-body $TEMPLATE_BODY \
         --region $AWS_REGION
-
         echo "Template validated"
-       aws cloudformation create-stack help 
+        echo $STACK_NAME
+        echo $TEMPLATE_BODY
+        echo $AWS_REGION
        
         # Deploy Cloud Formation template 
         aws cloudformation create-stack\
@@ -58,9 +57,8 @@ jobs:
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.GetApiUrl"'
-        POST_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
+        POST_API_URL=aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.PostApiUrl"'
-
       #Step4: Set up Node.js
     - name: set up Node.js
       uses: actions/setup-node@v4
@@ -73,5 +71,3 @@ jobs:
     - name: Run Cypress test 
       run: npx cypress run
         
-        
-      
