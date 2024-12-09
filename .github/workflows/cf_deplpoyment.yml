@@ -49,7 +49,7 @@ jobs:
         # Deploy Cloud Formation template 
         aws cloudformation create-stack \
         --stack-name my-resume-cf-stack\
-        --template-body file://https://github.com/agneselimbi/Cloud-Resume-Challenge/blob/main/cloudformation/resume_cf.yaml \
+        --template-body file://cloudformation/resume_cf.yaml \
         --capabilities CAPABILITY_IAM \
         --region us-west-1
         
