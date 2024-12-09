@@ -46,9 +46,9 @@ jobs:
 
             
         # Deploy Cloud Formation template 
-        aws cloudformation create-stack \
+        aws cloudformation deploy\
         --stack-name my-resume-cf-stack\
-        --template-body "file://cloudformation/resume_cf.yaml" \
+        --template-body "cloudformation/resume_cf.yaml" \
         --capabilities CAPABILITY_IAM \
         --region us-west-1
         
