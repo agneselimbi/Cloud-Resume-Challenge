@@ -40,14 +40,16 @@ jobs:
         aws sts get-caller-identity
         
         # Validate Cloud Formation template 
-        aws cloudformation validate-template --template-body $TEMPLATE_FILE --region $AWS_REGION
+        aws cloudformation validate-template \
+        --template-body $TEMPLATE_FILE \
+        --region $AWS_REGION
        
         # Deploy Cloud Formation template 
         aws cloudformation deploy\
-        --stack-name $STACK_NAME
-        --template-file $TEMPLATE_FILE
+        --stack-name $STACK_NAME\
+        --template-file $TEMPLATE_FILE\
         --capabilities CAPABILITY_IAM
-          
+        
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.GetApiUrl"'
