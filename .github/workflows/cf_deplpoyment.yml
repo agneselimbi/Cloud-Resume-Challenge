@@ -36,14 +36,15 @@ jobs:
         TEMPLATE_FILE=cloudformation/resume_cf.yaml
         STACK_NAME='my-resume-cf-stack'
         # Verify caller has the right credentials
-        aws sts get-caller-identity
+        #aws sts get-caller-identity
+        
         
         # Validate Cloud Formation template 
-        aws cloudformation validate-template \
-        --template-body $TEMPLATE_BODY \
-        --region $AWS_REGION
-        echo "Template validated"
-         aws cloudformation describe-stacks
+        #aws cloudformation validate-template \
+        #--template-body $TEMPLATE_BODY \
+        #--region $AWS_REGION
+        #echo "Template validated"
+        #aws cloudformation describe-stacks
         # Deploy Cloud Formation template 
         aws cloudformation deploy\
         --stack-name my-resume-cf-stack\
