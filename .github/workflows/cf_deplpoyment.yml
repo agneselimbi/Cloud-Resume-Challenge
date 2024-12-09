@@ -45,7 +45,7 @@ jobs:
         --region $AWS_REGION
        
         # Deploy Cloud Formation template 
-        aws cloudformation deploy\
+        aws cloudformation create-stack\
         --stack-name $STACK_NAME\
         --template-file $TEMPLATE_FILE\
         --capabilities CAPABILITY_IAM
