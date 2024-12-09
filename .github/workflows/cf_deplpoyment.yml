@@ -43,6 +43,8 @@ jobs:
         aws cloudformation deploy\
         --stack-name $STACK_NAME
         --template-file $TEMPLATE_FILE
+        --capabilities CAPABILITY_IAM
+          
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.GetApiUrl"'
