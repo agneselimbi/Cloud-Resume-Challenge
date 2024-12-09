@@ -13,7 +13,7 @@ jobs:
     steps:
     # Step 1: Check out the code
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
     # Step 2: Install AWS CLI and AWS SSO Login Tool
     - name: Install AWS CLI
