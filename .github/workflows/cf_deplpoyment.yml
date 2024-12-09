@@ -44,6 +44,11 @@ jobs:
         aws cloudformation validate-template \
         --template-body $TEMPLATE_BODY \
         --region $AWS_REGION
+
+        echo "Template validated"
+        echo $STACK_NAME
+        echo $TEMPLATE_BODY
+        echo $AWS_REGION
        
         # Deploy Cloud Formation template 
         aws cloudformation create-stack\
