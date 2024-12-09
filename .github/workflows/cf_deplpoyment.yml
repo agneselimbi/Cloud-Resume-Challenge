@@ -44,12 +44,12 @@ jobs:
         --region $AWS_REGION
         echo "Template validated"
 
-        aws cloudformation describe-stacks --stack-name my-resume-cf-stack   
         # Deploy Cloud Formation template 
-        #aws cloudformation deploy\
-        #--stack-name my-resume-cf-stack\
-        #--template-file cloudformation/resume_cf.yaml \
-        #--capabilities CAPABILITY_IAM 
+        aws cloudformation deploy\
+        --stack-name my-resume-cf-stack\
+        --template-file cloudformation/resume_cf.yaml \
+        --capabilities CAPABILITY_IAM 
+        --debug
         
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
