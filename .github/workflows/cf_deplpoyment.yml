@@ -7,7 +7,7 @@ on:
   workflow_dispatch:  # Allow manual triggers
 
 jobs:
-  use-iam-identity-center:
+  use-aws-credentials:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,13 +32,15 @@ jobs:
         export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
         export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
-        aws sts get-caller-identity
-        AWS_REGION="us-west-1"
+        export AWS_REGION=$(AWS_REGION)
         TEMPLATE_FILE='file://cloudformation/resume_cf.yaml'  
         STACK_NAME='my-resume-cf-stack'
+
+        aws sts get-caller-identity
         
         # Validate Cloud Formation template 
         aws cloudformation validate-template --template-body $TEMPLATE_FILE --region $AWS_REGION
+       
         # Deploy Cloud Formation template 
         aws cloudformation deploy\
         --stack-name $STACK_NAME
