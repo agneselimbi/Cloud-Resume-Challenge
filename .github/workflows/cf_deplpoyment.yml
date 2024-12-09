@@ -33,7 +33,8 @@ jobs:
         export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
         export AWS_REGION=${AWS_REGION}
-        TEMPLATE_FILE="file://cloudformation/resume_cf.yaml"
+        TEMPLATE_BODY="file://cloudformation/resume_cf.yaml"
+        TEMPLATE_FILE="cloudformation/resume_cf.yaml"
         STACK_NAME='my-resume-cf-stack'
 
         # Verify caller has the right credentials
@@ -41,11 +42,11 @@ jobs:
         
         # Validate Cloud Formation template 
         aws cloudformation validate-template \
-        --template-body $TEMPLATE_FILE \
+        --template-body $TEMPLATE_BODY \
         --region $AWS_REGION
        
         # Deploy Cloud Formation template 
-        aws cloudformation create-stack\
+        aws cloudformation deploy\
         --stack-name $STACK_NAME\
         --template-file $TEMPLATE_FILE\
         --capabilities CAPABILITY_IAM
