@@ -43,7 +43,7 @@ jobs:
         --template-body $TEMPLATE_BODY \
         --region $AWS_REGION
         echo "Template validated"
-
+         aws cloudformation describe-stacks
         # Deploy Cloud Formation template 
         aws cloudformation deploy\
         --stack-name my-resume-cf-stack\
