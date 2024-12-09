@@ -24,7 +24,7 @@ jobs:
         
         aws --version
 
-    # Step 3: Authenticate with AWS environment variables
+    # Step 3: Authenticate with AWS environment variables.
   
     - name: AWS Login
       env:
