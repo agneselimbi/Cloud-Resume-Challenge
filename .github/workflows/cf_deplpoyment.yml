@@ -63,7 +63,6 @@ jobs:
       run: |
         export GET_API_URL=$GET_API_URL
         export POST_API_URL=$POST_API_URL
-        echo $GET_API_URL
         cd scripts
         npx cypress run --env GET_API_URL=$GET_API_URL POST_API_URL=$POST_API_URL
       
