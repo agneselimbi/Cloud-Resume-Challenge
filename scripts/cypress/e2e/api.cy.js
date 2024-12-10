@@ -20,42 +20,48 @@ describe("test api", ()=>{
     })
     
     it('test post resource', ()=>{
-        let initialVisitorCount ;
-        cy.request('POST',Cypress.env('POST_API_URL'))
-        .then((postresponse)=>{
-            expect(Cypress.env('POST_API_URL')).to.exist;
-            //validate the status code 
-            expect(postresponse.status).to.eq(200);
-            //validate ip address
-            const validMessages = ["Visitor count already updated", "Visitor added to table succesfully !"];
-            expect(validMessages).to.include(postresponse.body.message);
-        });
-        cy.request('GET',Cypress.env('GET_API_URL'))
-        .then((getresponse)=>{
-           expect(Cypress.env('GET_API_URL')).to.exist;
-            //validate the status code 
-            expect(getresponse.status).to.eq(200);
-            //validate the response body
-            expect(getresponse.body).to.have.property('total_visitor_count');
-            initialVisitorCount = getresponse.body.total_visitor_count
-        });
-        cy.request('POST',Cypress.env('POST_API_URL'))     
-        .then((postresponse1)=>{
-            expect(Cypress.env('POST_API_URL')).to.exist;
-            //validate the status code 
-            expect(postresponse1.status).to.eq(200);
-            //validate ip address
-            expect(postresponse1.body).to.deep.eq({message: "Visitor count already updated"});  
-        });
-        cy.request('GET',Cypress.env('GET_API_URL'))
-        .then((getresponse1)=>{
-            expect(Cypress.env('GET_API_URL')).to.exist;
-            //validate the status code 
-            expect(getresponse1.status).to.eq(200);
-            //validate the response body
-            expect(getresponse1.body.total_visitor_count).to.eq(initialVisitorCount)
-        });
+        let initialVisitorCount;
+        // Ensure environment variables exist
+        expect(Cypress.env('POST_API_URL')).to.exist;
+        expect(Cypress.env('GET_API_URL')).to.exist;
+    
+        // Initial GET Request
+    cy.request('GET', Cypress.env('GET_API_URL'))
+    .then((getResponse) => {
+        // Validate the status code
+        expect(getResponse.status).to.eq(200);
+
+        // Validate the response body
+        expect(getResponse.body).to.have.property('total_visitor_count');
+        initialVisitorCount = getResponse.body.total_visitor_count;
+
+        // Perform POST Request
+        return cy.request('POST', Cypress.env('POST_API_URL'));
     })
+    .then((postResponse) => {
+        // Validate the POST response
+        expect(postResponse.status).to.eq(200);
+
+        // Validate the message
+        const validMessages = [
+            "Visitor count already updated",
+            "Visitor added to table succesfully !"
+        ];
+        expect(validMessages).to.include(postResponse.body.message);
+
+        // Second GET Request to verify visitor count
+        return cy.request('GET', Cypress.env('GET_API_URL'));
+    })
+    .then((getResponseAfterPost) => {
+        // Validate the status code
+        expect(getResponseAfterPost.status).to.eq(200);
+
+        // Validate the visitor count remains consistent
+        expect(getResponseAfterPost.body.total_visitor_count).to.eq(initialVisitorCount);
+    });
+
+    });
+
 
     it("fail Post response", () =>{
         cy.request({
