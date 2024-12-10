@@ -45,7 +45,7 @@ describe("test api", ()=>{
             //validate the status code 
             expect(getresponse1.status).to.eq(200);
             //validate the response body
-            expect(getresponse1.body.total_visitor_count).to.eq(getresponse1.body.total_visitor_count)
+            expect(getresponse1.body.total_visitor_count).to.eq(postresponse1.body.total_visitor_count)
         });
     })
 
