@@ -1,6 +1,6 @@
 describe("test api", ()=>{
     it('test get resource', ()=>{
-        cy.request('GET',"https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/getVisitorCount")
+        cy.request('GET',GET_API_URL)
         .then((response)=>{
             //validate the status code 
             expect(response.status).to.eq(200);
@@ -19,28 +19,28 @@ describe("test api", ()=>{
     })
     
     it('test post resource', ()=>{
-        cy.request('POST',"https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/incrementVisitorCount")
+        cy.request('POST',POST_API_URL)
         .then((postresponse)=>{
             //validate the status code 
             expect(postresponse.status).to.eq(200);
             //validate ip address
             expect(postresponse.body).to.deep.eq({message:"Visitor added to table succesfully !"});
         });
-        cy.request('GET',"https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/getVisitorCount")
+        cy.request('GET',GET_API_URL)
         .then((getresponse)=>{
             //validate the status code 
             expect(getresponse.status).to.eq(200);
             //validate the response body
             expect(getresponse.body).to.have.property('total_visitor_count')
         });
-        cy.request('POST',"https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/incrementVisitorCount")
+        cy.request('POST',POST_API_URL)
         .then((postresponse1)=>{
             //validate the status code 
             expect(postresponse1.status).to.eq(200);
             //validate ip address
             expect(postresponse1.body).to.deep.eq({message: "Visitor count already updated"});  
         });
-        cy.request('GET',"https://3hj9vc9684.execute-api.us-west-1.amazonaws.com/dev/getVisitorCount")
+        cy.request('GET',GET_API_URL)
         .then((getresponse1)=>{
             //validate the status code 
             expect(getresponse1.status).to.eq(200);
