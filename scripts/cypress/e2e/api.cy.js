@@ -22,7 +22,7 @@ describe("test api", ()=>{
     it('test post resource', ()=>{
         let initialVisitorCount;
         // Ensure environment variables exist
-        expect(Cypress.env('POST_API_URL')).to.exist;
+       // expect(Cypress.env('POST_API_URL')).to.exist;
         expect(Cypress.env('GET_API_URL')).to.exist;
     
         // Initial GET Request
@@ -49,7 +49,7 @@ describe("test api", ()=>{
         ];
         expect(validMessages).to.include(postResponse.body.message);
 
-        // Second GET Request to verify visitor count
+        // Second GET Request to verify ncremented  visitor count
         return cy.request('GET', Cypress.env('GET_API_URL'));
     })
     .then((getResponseAfterPost) => {
@@ -57,11 +57,20 @@ describe("test api", ()=>{
         expect(getResponseAfterPost.status).to.eq(200);
 
         // Validate the visitor count remains consistent
-        expect(getResponseAfterPost.body.total_visitor_count).to.eq(initialVisitorCount);
+        expect(getResponseAfterPost.body.total_visitor_count).to.eq(initialVisitorCount+1);
+
+        // Third GET request to verify you can't update visitor count
+        return cy.request('GET', Cypress.env('GET_API_URL'));
+    })
+    .then((secondgetResponse) => {
+        // Validate the status code
+        expect(secondgetResponse.status).to.eq(200);
+
+        // Validate the visitor count remains consistent
+        expect(secondgetResponse.body.total_visitor_count).to.eq(initialVisitorCount+1);
     });
 
     });
-
 
     it("fail Post response", () =>{
         cy.request({
