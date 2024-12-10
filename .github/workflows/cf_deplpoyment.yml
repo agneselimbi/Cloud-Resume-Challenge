@@ -43,7 +43,7 @@ jobs:
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.GetApiUrl"'>> $GITHUB_ENV
-        POST_API_URL=aws cloudformation describe-stacks --stack-name $STACK_NAME\
+        POST_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
           --query "Stacks[0].Outputs.PostApiUrl"'>> $GITHUB_ENV
 
         # 
