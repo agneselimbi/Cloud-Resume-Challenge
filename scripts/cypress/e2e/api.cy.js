@@ -2,7 +2,7 @@ describe("test api", ()=>{
     it('test get resource', ()=>{
         cy.request('GET',Cypress.env('GET_API_URL'))
         .then((response)=>{
-            expect(Cypress.env('GET_API_URL').to.exist);
+            expect(Cypress.env('GET_API_URL')).to.exist;
             //validate the status code 
             expect(response.status).to.eq(200);
             //validate the response body
