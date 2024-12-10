@@ -48,7 +48,7 @@ jobs:
           --query "Stacks[0].Outputs[?OutputKey=='PostApiUrl'].OutputValue" --output text)
         echo "POST_API_URL=$POST_API_URL" >> $GITHUB_ENV
           
-      #Step4: Set up Node.js
+      # Step4: Set up Node.js
     - name: set up Node.js
       uses: actions/setup-node@v4
       with:
