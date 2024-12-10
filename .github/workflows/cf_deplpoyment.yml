@@ -1,0 +1,65 @@
+name: Cloud Formation Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  use-aws-credentials:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the code
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    # Step 2: Install AWS CLI and AWS SSO Login Tool
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update && sudo apt-get install -y awscli
+        aws --version
+    # Step 3: Authenticate with AWS environment variables
+    - name: "Configure AWS Credentials" 
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: us-west-1
+        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{secrets.AWS_SESSION_TOKEN }}  
+        
+        
+    - name: Deploy Cloud Formation template
+      run: |
+        aws sts get-caller-identity
+        # Deploy Cloud Formation template 
+        aws cloudformation deploy\
+          --stack-name my-resume-cf-stack\
+          --template-file cloudformation/resume_cf.yaml \
+          --capabilities CAPABILITY_IAM 
+          --no-fail-on-empty-changeset 1
+          
+        # Collect API outputs
+        GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
+          --query "Stacks[0].Outputs.GetApiUrl"'>> $GITHUB_ENV
+        POST_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
+          --query "Stacks[0].Outputs.PostApiUrl"'>> $GITHUB_ENV
+
+        # 
+      #Step4: Set up Node.js
+    - name: set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Cypress test 
+      run: |
+        export GET_API_URL=$GET_API_URL
+        export POST_API_URL=$POST_API_URL
+        npx cypress run
+      
+        
