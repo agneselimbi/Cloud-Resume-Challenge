@@ -42,9 +42,9 @@ jobs:
           
         # Collect API outputs
         GET_API_URL=aws cloudformation describe-stacks --stack-name my-resume-cf-stack\
-          --query "Stacks[0].Outputs.GetApiUrl">> $GITHUB_ENV
+          --query "Stacks[0].Outputs[1].OutputValue[0]">> $GITHUB_ENV
         POST_API_URL=aws cloudformation describe-stacks --stack-name my-resume-cf-stack\
-          --query "Stacks[0].Outputs.PostApiUrl">> $GITHUB_ENV
+          --query "Stacks[0].Outputs[1].OutputValue[1]">> $GITHUB_ENV
         echo $GET_API_URL
           
       #Step4: Set up Node.js
