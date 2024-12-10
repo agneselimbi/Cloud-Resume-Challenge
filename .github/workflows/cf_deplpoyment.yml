@@ -56,12 +56,9 @@ jobs:
       run: npm install
 
     - name: Run Cypress test 
-      env:
-        GET_API_URL: ${{GET_API_URL}}
-        POST_API_URL: ${{POST_API_URL}}
       run: |
-        export GET_API_URL=${GET_API_URL}
-        export POST_API_URL=${POST_API_URL}
+        export GET_API_URL=$GET_API_URL
+        export POST_API_URL=$POST_API_URL
         npx cypress run
       
         
