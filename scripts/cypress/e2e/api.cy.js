@@ -26,7 +26,7 @@ describe("test api", ()=>{
             //validate ip address
             expect(postresponse.body).to.deep.eq({message:"Visitor added to table succesfully !"});
         });
-        cy.request('GET',Cypress.env(GET_API_URL))
+        cy.request('GET',Cypress.env('GET_API_URL'))
         .then((getresponse)=>{
             //validate the status code 
             expect(getresponse.status).to.eq(200);
