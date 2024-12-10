@@ -21,43 +21,23 @@ jobs:
         sudo apt-get update && sudo apt-get install -y awscli
         aws --version
     # Step 3: Authenticate with AWS environment variables
-    - name: AWS Login
-      uses: aws-action/configure-aws-credentials@v1
-      env:
-        AWS_REGION: "us-west-1"
-        AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-        AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}  
+    - name: "Configure AWS Credentials" 
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id = ${{secrets.AWS_ACCESS_KEY_ID}}
-        aws-secret-access-key=${{secrets.AWS_SECRET_ACCESS_KEY}}
-        aws-session-token=${{secrets.AWS_SESSION_TOKEN}}  
-      #run: |
-        #export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-        #export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-        #export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
-        #export AWS_REGION=${AWS_REGION}
-        #TEMPLATE_BODY="file://cloudformation/resume_cf.yaml"
-        #TEMPLATE_FILE=cloudformation/resume_cf.yaml
-        #STACK_NAME='my-resume-cf-stack'
-        # Verify caller has the right credentials
-           
+        aws-access-key-id:${{secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key:${{secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:${{secrets.AWS_SESSION_TOKEN }}  
+        aws-region:us-west-1
         
     - name: Deploy Cloud Formation template
-      run:
+      run: |
         aws sts get-caller-identity
-        # Validate Cloud Formation template 
-        #aws cloudformation validate-template \
-        #--template-body $TEMPLATE_BODY \
-        #--region $AWS_REGION
-        #echo "Template validated"
-        #aws cloudformation describe-stacks
         # Deploy Cloud Formation template 
         aws cloudformation deploy\
-        --stack-name my-resume-cf-stack\
-        --template-file cloudformation/resume_cf.yaml \
-        --capabilities CAPABILITY_IAM 
-        --debug
+          --stack-name my-resume-cf-stack\
+          --template-file cloudformation/resume_cf.yaml \
+          --capabilities CAPABILITY_IAM 
+          --debug
         
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
