@@ -38,6 +38,7 @@ jobs:
           --stack-name my-resume-cf-stack\
           --template-file cloudformation/resume_cf.yaml \
           --capabilities CAPABILITY_IAM 
+          --no-fail-on-empty-changeset 1
           
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
