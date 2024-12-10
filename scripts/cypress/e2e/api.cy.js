@@ -1,6 +1,7 @@
 describe("test api", ()=>{
     it('test get resource', ()=>{
         cy.request('GET',Cypress.env('GET_API_URL'))
+        //cy.request('GET',Cypress.env('GET_API_URL'))
         .then((response)=>{
             //validate the status code 
             expect(response.status).to.eq(200);
@@ -18,7 +19,7 @@ describe("test api", ()=>{
         });
     })
     
-    it.only('test post resource', ()=>{
+    it('test post resource', ()=>{
         let initialVisitorCount ;
         cy.request('POST',Cypress.env('POST_API_URL'))
         .then((postresponse)=>{
