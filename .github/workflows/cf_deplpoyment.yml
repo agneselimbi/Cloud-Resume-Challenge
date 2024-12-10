@@ -41,11 +41,12 @@ jobs:
           --no-fail-on-empty-changeset
           
         # Collect API outputs
-        GET_API_URL=aws cloudformation describe-stacks --stack-name my-resume-cf-stack\
-          --query "Stacks[0].Outputs[0].OutputValue">> $GITHUB_ENV
-        POST_API_URL=aws cloudformation describe-stacks --stack-name my-resume-cf-stack\
-          --query "Stacks[0].Outputs[1].OutputValue">> $GITHUB_ENV
-        echo $GET_API_URL
+        GET_API_URL=$(aws cloudformation describe-stacks --stack-name my-resume-cf-stack \
+          --query "Stacks[0].Outputs[?OutputKey=='GetApiUrl'].OutputValue" --output text)
+        echo "PGET_API_URL=$PGET_API_URL" >> $GITHUB_ENV
+        POST_API_URL=$(aws cloudformation describe-stacks --stack-name my-resume-cf-stack \
+          --query "Stacks[0].Outputs[?OutputKey=='PostApiUrl'].OutputValue" --output text)
+        echo "POST_API_URL=$POST_API_URL" >> $GITHUB_ENV
           
       #Step4: Set up Node.js
     - name: set up Node.js
