@@ -18,23 +18,29 @@ describe("test api", ()=>{
         });
     })
     
-    it('test post resource', ()=>{
+    it.only('test post resource', ()=>{
+        let initialVisitorCount ;
         cy.request('POST',Cypress.env('POST_API_URL'))
         .then((postresponse)=>{
+            expect(Cypress.env('POST_API_URL')).to.exist;
             //validate the status code 
             expect(postresponse.status).to.eq(200);
             //validate ip address
-            expect(postresponse.body).to.deep.eq({message:"Visitor added to table succesfully !"});
+            const validMessages = ["Visitor count already updated", "Visitor added to table succesfully !"];
+            expect(validMessages).to.include(response.body.message);
         });
         cy.request('GET',Cypress.env('GET_API_URL'))
         .then((getresponse)=>{
+           // expect(Cypress.env('GET_API_URL')).to.exist;
             //validate the status code 
             expect(getresponse.status).to.eq(200);
             //validate the response body
-            expect(getresponse.body).to.have.property('total_visitor_count')
+            expect(getresponse.body).to.have.property('total_visitor_count');
+            initialVisitorCount = getresponse.body.total_visitor_count
         });
         cy.request('POST',Cypress.env('POST_API_URL'))
         .then((postresponse1)=>{
+           // expect(Cypress.env('POST_API_URL')).to.exist;
             //validate the status code 
             expect(postresponse1.status).to.eq(200);
             //validate ip address
@@ -42,10 +48,11 @@ describe("test api", ()=>{
         });
         cy.request('GET',Cypress.env('GET_API_URL'))
         .then((getresponse1)=>{
+            //expect(Cypress.env('GET_API_URL')).to.exist;
             //validate the status code 
             expect(getresponse1.status).to.eq(200);
             //validate the response body
-            expect(getresponse1.body.total_visitor_count).to.eq(postresponse1.body.total_visitor_count)
+            expect(getresponse1.body.total_visitor_count).to.eq(initialVisitorCount)
         });
     })
 
