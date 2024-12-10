@@ -1,6 +1,6 @@
 describe("test api", ()=>{
     it('test get resource', ()=>{
-        cy.request('GET',Cypress.env(GET_API_URL))
+        cy.request('GET',Cypress.env('GET_API_URL'))
         .then((response)=>{
             //validate the status code 
             expect(response.status).to.eq(200);
@@ -19,7 +19,7 @@ describe("test api", ()=>{
     })
     
     it('test post resource', ()=>{
-        cy.request('POST',Cypress.env(pageXOffset_API_URL))
+        cy.request('POST',Cypress.env('POST_API_URL'))
         .then((postresponse)=>{
             //validate the status code 
             expect(postresponse.status).to.eq(200);
@@ -33,14 +33,14 @@ describe("test api", ()=>{
             //validate the response body
             expect(getresponse.body).to.have.property('total_visitor_count')
         });
-        cy.request('POST',Cypress.env(POST_API_URL))
+        cy.request('POST',Cypress.env('POST_API_URL'))
         .then((postresponse1)=>{
             //validate the status code 
             expect(postresponse1.status).to.eq(200);
             //validate ip address
             expect(postresponse1.body).to.deep.eq({message: "Visitor count already updated"});  
         });
-        cy.request('GET',Cypress.env(GET_API_URL))
+        cy.request('GET',Cypress.env('GET_API_URL'))
         .then((getresponse1)=>{
             //validate the status code 
             expect(getresponse1.status).to.eq(200);
