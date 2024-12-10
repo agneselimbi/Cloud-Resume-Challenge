@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:  # Allow manual triggers
 
-jos:
+jobs:
   use-aws-credentials:
     runs-on: ubuntu-latest
 
