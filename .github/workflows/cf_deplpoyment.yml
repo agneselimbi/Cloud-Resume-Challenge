@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:  # Allow manual triggers
 
-jobs:
+jos:
   use-aws-credentials:
     runs-on: ubuntu-latest
 
@@ -38,13 +38,14 @@ jobs:
           --stack-name my-resume-cf-stack\
           --template-file cloudformation/resume_cf.yaml \
           --capabilities CAPABILITY_IAM 
-          --debug
-        
+          
         # Collect API outputs
         GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
-          --query "Stacks[0].Outputs.GetApiUrl"'
+          --query "Stacks[0].Outputs.GetApiUrl"'>> $GITHUB_ENV
         POST_API_URL=aws cloudformation describe-stacks --stack-name $STACK_NAME\
-          --query "Stacks[0].Outputs.PostApiUrl"'
+          --query "Stacks[0].Outputs.PostApiUrl"'>> $GITHUB_ENV
+
+        # 
       #Step4: Set up Node.js
     - name: set up Node.js
       uses: actions/setup-node@v4
@@ -55,5 +56,12 @@ jobs:
       run: npm install
 
     - name: Run Cypress test 
-      run: npx cypress run
+      env:
+        GET_API_URL: ${{GET_API_URL}}
+        POST_API_URL: ${{POST_API_URL}}
+      run: |
+        export GET_API_URL=${GET_API_URL}
+        export POST_API_URL=${POST_API_URL}
+        npx cypress run
+      
         
