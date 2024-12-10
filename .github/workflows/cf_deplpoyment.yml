@@ -53,12 +53,16 @@ jobs:
         node-version: 18
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        cd scripts
+        npm install
 
     - name: Run Cypress test 
       run: |
-        export GET_API_URL=$GET_API_URL
-        export POST_API_URL=$POST_API_URL
-        npx cypress run
+        #export GET_API_URL=$GET_API_URL
+        #export POST_API_URL=$POST_API_URL
+        echo GET_API_URL
+        cd scripts
+        npx cypress run --env GET_API_URL=$GET_API_URL POST_API_URL=$POST_API_URL
       
         
