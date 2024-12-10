@@ -37,7 +37,7 @@ jobs:
         aws cloudformation deploy\
           --stack-name my-resume-cf-stack\
           --template-file cloudformation/resume_cf.yaml \
-          --capabilities CAPABILITY_IAM 
+          --capabilities CAPABILITY_IAM \
           --no-fail-on-empty-changeset
           
         # Collect API outputs
