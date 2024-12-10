@@ -41,10 +41,10 @@ jobs:
           --no-fail-on-empty-changeset
           
         # Collect API outputs
-        GET_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
-          --query "Stacks[0].Outputs.GetApiUrl"'>> $GITHUB_ENV
-        POST_API_URL='aws cloudformation describe-stacks --stack-name $STACK_NAME\
-          --query "Stacks[0].Outputs.PostApiUrl"'>> $GITHUB_ENV
+        GET_API_URL=aws cloudformation describe-stacks --stack-name $STACK_NAME\
+          --query "Stacks[0].Outputs.GetApiUrl">> $GITHUB_ENV
+        POST_API_URL=aws cloudformation describe-stacks --stack-name $STACK_NAME\
+          --query "Stacks[0].Outputs.PostApiUrl">> $GITHUB_ENV
         echo $GET_API_URL
           
       #Step4: Set up Node.js
